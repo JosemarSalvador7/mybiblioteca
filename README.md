@@ -33,7 +33,9 @@ O **mybiblioteca** é um sistema web desenvolvido em **Django** para **gerenciam
 ## 📁 Estrutura do Projeto
 mybiblioteca/
 ├── core/ # Configurações centrais do Django
+
 ├── livro/ # App principal de gerenciamento de livros
+
 │ ├── models.py # Modelo: Livro
 │ ├── views.py # Lógica das páginas
 │ └── admin.py # Interface administrativa
