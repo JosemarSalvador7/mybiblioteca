@@ -1,0 +1,208 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="{% static '/bootstrap53/css/bootstrap.min.css' %}"
+    />
+    <link rel="stylesheet" href="{% static '/css/styles.css' %}" />
+    <title>{% block titulo %}{% endblock titulo %}</title>
+  </head>
+  <body>
+    <header class="bg-black">
+      <nav
+        class="container d-flex justify-content-between align-content-center align-items-center"
+      >
+        <a href="{% url 'home' %}">
+          <h1 class="text-white p-1">Mybooks</h1>
+        </a>
+
+        <div class="d-flex gap-3">
+          {% if usuario %}
+          <div>
+            <h4 class="text-white mb-0 p-0">Usuario: {{usuario.name}}</h4>
+            <small class="small m-0 text-white-50"> {{usuario.email}}</small>
+          </div>
+          <div>
+          <div class="btn-group dropup">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Menu</button>
+            <ul class="dropdown-menu">
+              <li> <p data-bs-toggle="modal" data-bs-target="#exampleModalLive" class="dropdown-item">Opções</p></li>
+              <li><a href="{% url 'meus_emprestimos' %}" class="dropdown-item">Meus emprestimos</a></li>
+              <li><a class="dropdown-item"href="{% url 'sair' %}" role="button" class="btn btn-danger">sair</a></li>
+              <div class="dropdown-divider"></div>
+              <li><p class="dropdown-item">Total {{total_livro}}</p></li>
+            </ul>
+          </div>
+            
+          {% endif %}
+        </div>
+      </nav>
+    </header>
+
+    {% block conteudo %}
+    {% endblock conteudo %} 
+  {% if usuario %}
+    <div
+      class="modal fade"
+      id="exampleModalLive"
+      tabindex="-1"
+      aria-labelledby="exampleModalLiveLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLiveLabel">
+              Cadastrar/emprestar/desenvolver
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="btn-group mb-4">
+              <button class="btn btn-primary" onclick="mostrar_form(1)">
+                categoria
+              </button>
+              <button class="btn btn-primary" onclick="mostrar_form(2)">
+                Livro
+              </button>
+              <button class="btn btn-primary" onclick="mostrar_form(3)">
+                Emprestimos
+              </button>
+              <button class="btn btn-primary" onclick="mostrar_form(4)">
+               Devolução
+              </button>
+            </div>
+            <div id="categoria" style="display: none">
+              <form action="{% url 'cadastrar_categoria' %}" method="post">
+                {% csrf_token %}
+                  {{form_categoria | crispy}}
+                <input type="hidden" name="usuario" value="{{usuario.id}}" />
+                <input type="submit" value="Enviar" class="btn btn-success" />
+              </form>
+            </div>
+            <div id="livro" style="display: none">
+              <form action="{% url 'cadastrar_livro' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+           
+                  {{forms |crispy}}
+   
+                <button type="submit" class="btn btn-success">Enviar</button>
+              </form>
+            </div>
+            {% comment %} div de emprestimo {% endcomment %}
+            <div id="emprestimo" style="display: none">
+              <form action="{% url 'cadastrar_emprestimo' %}" method="POST">{% csrf_token %}
+
+        
+                  <a role="button" class="btn btn-success" onclick="mostra_input_emprestado(1)">Usuario existente</a>
+                  <a role="button" class="btn btn-dark" onclick="mostra_input_emprestado(2)">Leitor externo</a>
+               
+                <div id="select_user" style="display: none">
+                    <label for="select_user">Usuario do sistema</label>
+                    <select name="select_user" class="form-control mb-2">
+                      <option  disabled selected>
+                        selecione usuario
+                      </option>
+                      {% for user in usuarios %}
+                      <option value="{{user.id}}">{{user.name}}</option>
+                      {% endfor %}
+                    </select>
+                </div>
+
+                <select name="select_book" id="select_book" class="form-control mb-2" required>
+                  <option  disabled selected>
+                    selecione o livro
+                  </option>
+                  {% for livro in livros_all %}
+                  <option value="{{livro.id}}">{{livro.titulo}}</option>
+                  {% endfor %}
+                </select>
+
+                <div id="select_user_anonimo">
+                  <label for="select_user_anonimo">Usuario do sistema</label>
+                  <input
+                    type="text"
+                    name="select_user_anonimo"
+                    class="form-control mb-2"
+                    placeholder="digite o nome de quem vai emprestar"
+
+                  />
+                </div>
+
+                <input
+                  type="submit"
+                  value="emprestar"
+                  class="btn btn-success m-2"
+                />
+              </form>
+            </div>
+{% comment %} devolver {% endcomment %}
+              <div id="devolucao" style="display: none">
+              <form action="{% url 'devolver_livro' %}"  method="post">{% csrf_token %}
+              <select name="livro_devolvido" id="" class="form-control">
+                {% for livro in livros_emprestados %}
+                <option value="{{livro.id}}">{{livro.titulo}}</option>
+                {% endfor %}
+              </select> 
+
+                <button type="submit" class="btn btn-success">Devolver</button>
+              </form>
+            </div>
+            {% comment %} fim da div de empresttimo {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <script src="{% static '/bootstrap53/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+      function mostrar_form(arg) {
+        let categoria = document.getElementById("categoria");
+        let livro = document.getElementById("livro");
+        let emprestimo = document.getElementById("emprestimo");
+        let devolucao = document.getElementById("devolucao");
+        if (arg == 1) {
+          categoria.style.display = "block";
+          livro.style.display = "none";
+          emprestimo.style.display = "none";
+          devolucao.style.display = "none";
+        } else if (arg == 2) {
+          livro.style.display = "block";
+          emprestimo.style.display = "none";
+          categoria.style.display = "none";
+           devolucao.style.display = "none";
+        } else if (arg == 3) {
+          emprestimo.style.display = "block";
+          livro.style.display = "none";
+          categoria.style.display = "none";
+           devolucao.style.display = "none";
+        }else if (arg == 4){
+           emprestimo.style.display = "none";
+          livro.style.display = "none";
+          categoria.style.display = "none";
+          devolucao.style.display = "block";
+        }
+      }
+      function mostra_input_emprestado(arg) {
+        select_user_anonimo = document.getElementById('select_user_anonimo')
+        select_user = document.getElementById('select_user')
+        if (arg == 1) {
+          select_user.style.display = "block";
+          select_user_anonimo.style.display = "none";
+
+        }else{
+          select_user.style.display = "none";
+          select_user_anonimo.style.display = "block";
+        }
+      }
+    </script>
+  </body>
+</html>

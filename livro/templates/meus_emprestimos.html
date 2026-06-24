@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block conteudo %}
+<main class="container mt-3">
+    <h1>Meus emprestimos</h1>
+<div class="row">
+    {% for emprestimo in emprestimos %}
+        <div class="col-md-4 col-sm-6 mt-1">
+            <div class="card shadow-sm" >
+                <div class="card-body p-3" style="line-height: 20px;">
+                    <p class="fw-bold" style="font-size: 23px;">{{emprestimo.livro | capfirst}}</p>
+                    <p>{{emprestimo.data_emprestimo}}</p>
+                    <p>{{emprestimo.data_devolucao | default:"Ainda não foi devolvido"}}</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+
+</main>
+{% endblock conteudo %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %} 
+{% load crispy_forms_tags %}
+{% block conteudo %}
+<main class="container">
+{% if status == "1" %}
+<div class="alert alert-success">
+        <p>Livro {{nome_livro}} eliminado com sucesso</p>
+</div>  
+{% endif %}
+                
+  <section class="container mt-3 gap-2 d-flex row-cols-3 flex-wrap">
+    {% for livro in livros %}
+    <div class="card col-md-3 p-2 shadow-sm" style="width: 32.3%">
+      {% if livro.img.url %}
+       <img src="{{livro.img.url }}" alt="{{livro.titulo}}" class="card-img">
+       {% endif %}
+      <h4 class="mb-1">{{livro.titulo}}</h4>
+      <h3
+        class="text-black-50"
+        style="font-size: medium; text-transform: capitalize; font-weight: 500"
+      >
+        {{livro.autor}}
+      </h3>
+      {% if livro.emprestado %}
+      <p>sim foi emprestado</p>
+      {% else %}
+      <p>nao foi emprestado</p>
+      {% endif %}
+      <a
+        href="{% url 'ver_livro' livro.id %}"
+        class="btn btn-primary"
+        style="font-size: 18px; font-weight: 500"
+        >ver livro</a
+      >
+    </div>
+    {% endfor %}
+  </section>
+</main>
+{% endblock conteudo %}

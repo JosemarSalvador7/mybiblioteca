@@ -1,0 +1,19 @@
+[project]
+name = "djangoexericios"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "crispy-bootstrap5>=2025.6",
+    "django>=6.0.4",
+    "django-crispy-forms>=2.5",
+    "pillow>=12.2.0",
+    "python-decouple>=3.8",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.408",
+    "ruff>=0.15.2",
+]
